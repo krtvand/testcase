@@ -9,8 +9,7 @@ class Vendor(models.Model):
 
 
 class BarcodeType(models.Model):
-    """e.g EAN-13
-    """
+    """e.g EAN-13    """
 
     type = models.CharField(max_length=20)
 
@@ -26,22 +25,34 @@ class Barcode(models.Model):
         return '[{}] {}'.format(self.type, self.value)
 
 
-class Currency(models.Model):
-    name = models.CharField(max_length=10, default='USD')
+# class Currency(models.Model):
+#     name = models.CharField(max_length=10, default='USD')
+#
+#     def __str__(self):
+#         return self.name
+#
+#
+# class Price(models.Model):
+#     currency = models.ForeignKey(Currency)
+#     value = models.DecimalField(max_digits=9, decimal_places=2)
+#
+#     def __str__(self):
+#         return '[{}] {}'.format(self.value, self.currency)
 
 
-class Price(models.Model):
-    currency = models.ForeignKey(Currency)
-    value = models.DecimalField(max_digits=9, decimal_places=2)
-
-
-class WeightType(models.Model):
-    name = models.CharField(max_length=20)
-
-
-class Weight(models.Model):
-    type = models.CharField(max_length=20)
-    value = models.DecimalField(max_digits=10, decimal_places=2)
+# class WeightType(models.Model):
+#     name = models.CharField(max_length=20)
+#
+#     def __str__(self):
+#         return self.name
+#
+#
+# class Weight(models.Model):
+#     type = models.ForeignKey(WeightType)
+#     value = models.DecimalField(max_digits=10, decimal_places=2)
+#
+#     def __str__(self):
+#         return '[{}] {}'.format(self.value, self.type)
 
 
 class Product(models.Model):
@@ -50,8 +61,13 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     barcode = models.ForeignKey(Barcode, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/')
-    price = models.ForeignKey(Price)
-    weight = models.ForeignKey(Weight)
+    # price = models.ForeignKey(Price)
+    # weight = models.ForeignKey(Weight)
+    price = models.DecimalField(max_digits=9, decimal_places=2)
+    weight = models.DecimalField(max_digits=9, decimal_places=2)
+
+    def __str__(self):
+        return '[{}] {}'.format(self.article, self.name)
 
 
 class Fullname(models.Model):

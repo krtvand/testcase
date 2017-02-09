@@ -9,14 +9,14 @@ class BarcodeAdmin(admin.ModelAdmin):
     model = models.Barcode
     list_display = ('type', 'value')
 
-# class RequestAdmin(admin.ModelAdmin):
-#     inlines = [ContractInline]
-#     list_display = ('it_manager_fullname', 'created_date', 'department_id')
 
-admin.site.register(models.Currency)
-admin.site.register(models.Price)
-admin.site.register(models.Weight)
+class ProductAdmin(admin.ModelAdmin):
+    model = models.Product
+    list_display = ('article', 'vendor', 'name',
+                    'barcode', 'image', 'price', 'weight')
+
 admin.site.register(models.BarcodeType)
 admin.site.register(models.Barcode, BarcodeAdmin)
 admin.site.register(models.Vendor)
-admin.site.register(models.Product)
+# TODO сделать поле Barcode типа Inline
+admin.site.register(models.Product, ProductAdmin)
