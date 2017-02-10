@@ -29,6 +29,7 @@ router.register(r'vendors', views.VendorViewSet)
 router.register(r'barcodes', views.BarcodeViewSet)
 router.register(r'barcodetypess', views.BarcodeTypeViewSet)
 router.register(r'recipients', views.RecipientViewSet)
+router.register(r'parcels', views.ParcelViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

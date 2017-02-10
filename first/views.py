@@ -44,3 +44,8 @@ class BarcodeTypeViewSet(viewsets.ModelViewSet):
 class RecipientViewSet(viewsets.ModelViewSet):
     queryset = models.Recipient.objects.all()
     serializer_class = serializers.RecipientSerializer
+
+
+class ParcelViewSet(viewsets.ModelViewSet):
+    queryset = models.Parcel.objects.all()
+    serializer_class = serializers.ParcelSerializer

@@ -158,3 +158,28 @@ class RecipientSerializer(serializers.HyperlinkedModelSerializer):
         address.save()
 
         return instance
+
+
+class ParcelSerializer(serializers.ModelSerializer):
+    products = serializers.HyperlinkedRelatedField(many=True,
+                                                   view_name='product-detail',
+                                                   queryset=models.Product.objects.all())
+    recipient = serializers.HyperlinkedRelatedField(view_name='recipient-detail',
+                                                    queryset=models.Recipient.objects.all())
+
+    class Meta:
+        model = models.Parcel
+        fields = ('url', 'recipient', 'isdelivered', 'isrefused', 'departure_date',
+                  'delivery_date', 'cost_of_delivery', 'products')
+
+    # def create(self, validated_data):
+    #     recipient_data = validated_data.pop('recipient')
+    #     recipient = models.Recipient.objects.create(recipient_data)
+    #
+    #     products_data = validated_data.pop('products')
+    #     products = models.Product.objects.create(**products_data)
+    #
+    #     parcel = models.Parcel.objects.create(recipient=recipient,
+    #                                           products=products,
+    #                                           **validated_data)
+    #     return parcel
