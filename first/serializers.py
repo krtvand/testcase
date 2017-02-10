@@ -37,6 +37,10 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
     # Вопрос - какой формат производителя в api
     # предпочтительнее? Hyperlink или id + name
     # т.е. есть ли смысл описывать вложенные сериализаторы?
+
+    # TODO изменять название изображений при загрузке на уникальное, при
+    # DELETE запросах, удалять из файловой системы
+
     barcode = BarcodeSerializer()
     vendor = serializers.HyperlinkedRelatedField(queryset=models.Vendor.objects.all(),
                                                  view_name='vendor-detail')
@@ -51,7 +55,8 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
     def create(self, validated_data):
         barcode_data = validated_data.pop('barcode')
         barcode = models.Barcode.objects.create(**barcode_data)
-        product = models.Product.objects.create(barcode=barcode, **validated_data)
+        product = models.Product.objects.create(barcode=barcode,
+                                                **validated_data)
         return product
 
     def update(self, instance, validated_data):
@@ -60,10 +65,13 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
         В случае, если в PUT запросе одно из необязательных полей
         будет отсутствовать, а в текущей модили это поле заполнено,
         то в результате текщее значение сотрется"""
+
         # TODO обрабатывать исключение KeyError: 'barcode',
         # когда мы в PUT запросе не указали эти поля
+        # TODO удалять фото при PUT запросе в случае, если
+        # соответсвующее поле изменилось на пустое
+
         barcode_data = validated_data.pop('barcode')
-        # Текущий объект
         barcode = instance.barcode
 
         # Вопрос, как автоматически обновить поля экземпляра?
@@ -81,4 +89,72 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
         return instance
 
 
+class FullnameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Fullname
+        fields = ('first_name', 'surname', 'patronymic')
 
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Address
+        fields = ('postal_code', 'country', 'state', 'city', 'address')
+
+
+class RecipientSerializer(serializers.HyperlinkedModelSerializer):
+    # TODO изменять название изображений при загрузке на уникальное, при
+    # DELETE запросах, удалять из файловой системы
+
+    fullname = FullnameSerializer()
+    address = AddressSerializer()
+
+    class Meta:
+        model = models.Recipient
+        fields = ('url', 'fullname', 'address', 'photo', 'registration_date')
+        read_only_fields = ('registration_date',)
+
+    def create(self, validated_data):
+        fullname_data = validated_data.pop('fullname')
+        fullname = models.Fullname.objects.create(**fullname_data)
+        address_data = validated_data.pop('address')
+        address = models.Address.objects.create(**address_data)
+        recipient = models.Recipient.objects.create(fullname=fullname,
+                                                    address=address,
+                                                    **validated_data)
+        return recipient
+
+    def update(self, instance, validated_data):
+        """Обновление объекта
+
+        В случае, если в PUT запросе одно из необязательных полей
+        будет отсутствовать, а в текущей модили это поле заполнено,
+        то в результате текщее значение сотрется
+
+        """
+        # TODO обрабатывать исключение KeyError: 'barcode',
+        # когда мы в PUT запросе не указали эти поля
+        # TODO удалять фото при PUT запросе в случае, если
+        # соответсвующее поле изменилось на пустое
+
+        fullname_data = validated_data.pop('fullname')
+        fullname = instance.fullname
+        address_data = validated_data.pop('address')
+        address = instance.address
+
+        # Вопрос, как автоматически обновить поля экземпляра?
+        instance.photo = validated_data.get('photo', instance.photo)
+        instance.save()
+
+        fullname.first_name = fullname_data.get('first_name', fullname.first_name)
+        fullname.surname = fullname_data.get('surname', fullname.surname)
+        fullname.patronymic = fullname_data.get('patronymic', fullname.patronymic)
+        fullname.save()
+
+        address.postal_code = address_data.get('postal_code', address.postal_code)
+        address.country = address_data.get('country', address.country)
+        address.state = address_data.get('state', address.state)
+        address.city = address_data.get('city', address.city)
+        address.address = address_data.get('address', address.address)
+        address.save()
+
+        return instance
