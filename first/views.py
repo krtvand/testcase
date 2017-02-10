@@ -23,3 +23,19 @@ class GroupViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = models.Product.objects.all()
     serializer_class = serializers.ProductSerializer
+
+
+class VendorViewSet(viewsets.ModelViewSet):
+    queryset = models.Vendor.objects.all()
+    serializer_class = serializers.VendorSerializer
+
+
+class BarcodeViewSet(viewsets.ModelViewSet):
+    queryset = models.Barcode.objects.all()
+    serializer_class = serializers.BarcodeSerializer
+    print(repr(serializer_class))
+
+
+class BarcodeTypeViewSet(viewsets.ModelViewSet):
+    queryset = models.BarcodeType.objects.all()
+    serializer_class = serializers.BarcodeTypeSerializer
