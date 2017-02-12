@@ -83,7 +83,8 @@ class Fullname(models.Model):
 
 
 class Address(models.Model):
-    # TODO продумать тип адреса, чтобы был интернациональный
+    # TODO продумать тип адреса, чтобы был интернациональный,
+    # посмотреть как выглядит адрес на Aliexpress
     postal_code = models.CharField(max_length=30)
     country = models.CharField(max_length=30)
     state = models.CharField(max_length=30, blank=True)
@@ -101,19 +102,31 @@ class Recipient(models.Model):
     address = models.ForeignKey(Address)
     photo = models.ImageField(upload_to='recipient_photos/',
                               blank=True, null=True)
+    # TODO для даты возможно стоит применить editable=False
     registration_date = models.DateField(auto_now=True)
 
     def __str__(self):
         return '{}, {}'.format(self.fullname, self.address)
 
 
+class ProductInParcel(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    count = models.IntegerField()
+    comment = models.CharField(max_length=500)
+
+
 class Parcel(models.Model):
+    # TODO включить параметр количество товаров для данной позиции,
+    # скорее всего придется описать промежуточную модель.
+    # products = models.ManyToManyField(ProductInParcel)
+    # TODO продумать механизм изменения статуса посылки isdelivered, isrefused
+    # возможно придется использовать PartialUpdates во view
     products = models.ManyToManyField(Product)
     recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE)
     isdelivered = models.BooleanField()
     isrefused = models.BooleanField()
-    departure_date = models.DateTimeField()
-    delivery_date = models.DateTimeField()
+    departure_date = models.DateTimeField(blank=True, null=True)
+    delivery_date = models.DateTimeField(blank=True, null=True)
     cost_of_delivery = models.DecimalField(max_digits=9,
                                            decimal_places=2)
 

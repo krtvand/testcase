@@ -1,7 +1,13 @@
 from django.contrib.auth.models import User, Group
+from django.db.models import Count
 from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from rest_framework.decorators import detail_route
 from . import serializers
 from . import models
+
+TOP_OTHERS_PRODUCT_COUNT = 3
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -24,6 +30,47 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = models.Product.objects.all()
     serializer_class = serializers.ProductSerializer
 
+    @detail_route(methods=['get'])
+    def statistics(self, request, pk=None):
+        """Расчет статистики по товару
+
+        1) Вероятность отказа от товара - отношение количества посылок с отказом
+        от всех посылок с этим товаром. Если товар ни раз не заказывался, то Null
+        2) Другие 3 товара, которые чаще всего заказывают с этим товаром.
+        """
+        parcels_with_product = models.Parcel.objects.filter(
+            products__in=[self.get_object()]
+        )
+
+        top_others = {}
+        refuse_probability_data = {}
+        if parcels_with_product:
+            # Вероятность отказа
+            refused_parcels = parcels_with_product.filter(isrefused=True)
+            refuse_probability_data['refuse_probability'] = len(refused_parcels) / len(parcels_with_product)
+
+            others_products_qs = models.Parcel.objects.values('products')\
+                .annotate(total=Count('products'))\
+                .filter(products__in=[self.get_object()]) \
+                .order_by('-total')
+                # .exclude(products=7)\
+
+            top_others['top_other_products'] = [x['products'] for x in others_products_qs
+                          if x['products'] != self.get_object().id][:TOP_OTHERS_PRODUCT_COUNT]
+
+        else:
+            refuse_probability_data['refuse_probability'] = None
+            top_others['top_other_products'] = None
+            # refused_parcels = []
+
+        # parcel_serializer = serializers.ParcelSerializer(refused_parcels, many=True, context={'request': request})
+        # refused_parcels_data = parcel_serializer.data
+
+        data = [refuse_probability_data, top_others]
+        response = Response(data)
+
+        return response
+
 
 class VendorViewSet(viewsets.ModelViewSet):
     queryset = models.Vendor.objects.all()
@@ -33,7 +80,6 @@ class VendorViewSet(viewsets.ModelViewSet):
 class BarcodeViewSet(viewsets.ModelViewSet):
     queryset = models.Barcode.objects.all()
     serializer_class = serializers.BarcodeSerializer
-    print(repr(serializer_class))
 
 
 class BarcodeTypeViewSet(viewsets.ModelViewSet):
