@@ -170,32 +170,44 @@ class ParcelValidatorMixin:
 
         Признак вручения не может быть установлен
         одновременно с признаком отказа
+        Рассматриваем 3 случая:
+        1) Оба параметра заданы в запросе
+        2) В запросе isdelivered=True, isrefused не задан,
+           а в экземпляре уже задан isrefused=True
+        3) В запросе isrefused=True, isdelivered не задан,
+           а в экземпляре уже задан isdelivered=True
         """
+
         bad_conditions = []
         # В запросе оба параметра заданы как True
-        # TODO keyerror не пойму почему!!
-        bad_conditions.append(
-            all(('isdelivered' in data,
-                 'isrefused' in data,
-                 data.get('isdelivered', False),
-                 data.get('isrefused', False)
-                 )))
+        try:
+            bad_conditions.append(
+                all(('isdelivered' in data,
+                     'isrefused' in data,
+                     data['isdelivered'] and data['isrefused']
+                     )))
+        except (KeyError, TypeError):
+            bad_conditions.append(False)
         # В запросе isdelivered=True, isrefused не задан,
         # а в экземпляре уже задан isrefused=True
-        bad_conditions.append(
-            all(['isdelivered' in data,
-                 'isrefused' not in data,
-                 data.get('isdelivered', False),
-                 self.instance.isrefused if self.instance else False
-                 ]))
+        try:
+            bad_conditions.append(
+                all(('isdelivered' in data,
+                     'isrefused' not in data,
+                     data['isdelivered'] and self.instance.isrefused
+                     )))
+        except (KeyError, AttributeError, TypeError):
+            bad_conditions.append(False)
         # В запросе isrefused=True, isdelivered не задан,
         # а в экземпляре уже задан isdelivered=True
-        bad_conditions.append(
-            all(['isdelivered' not in data,
-                 'isrefused' in data,
-                 data['isrefused'],
-                 self.instance.isdelivered if self.instance else False
-                 ]))
+        try:
+            bad_conditions.append(
+                all(('isdelivered' not in data,
+                     'isrefused' in data,
+                     data['isrefused'] and self.instance.isdelivered
+                     )))
+        except (KeyError, AttributeError, TypeError):
+            bad_conditions.append(False)
 
         if any(bad_conditions):
             raise serializers.ValidationError("Delivered flag can not be installed "
@@ -211,30 +223,39 @@ class ParcelValidatorMixin:
           3) запрос содержит только дату вручения,
              а в экземпляре уже сохранена дата отправки
         """
+
+        # Проверяем наличие ряда ошибочных условий
         bad_conditions = []
-        # 1) Оба параметра заданы в запросе
-        bad_conditions.append(
-            all(['departure_date' in data,
-                 'delivery_date' in data,
-                 data['departure_date'] > data['delivery_date']
-                 ]))
+        # 1) оба параметра получаем в запросе
+        try:
+            bad_conditions.append(
+                all(['departure_date' in data,
+                     'delivery_date' in data,
+                     data['departure_date'] > data['delivery_date']
+                     ]))
+        except (KeyError, TypeError):
+            bad_conditions.append(False)
+
         # 2) запрос содержит только только дату отпраки,
         #    а в экземпляре уже сохранена дата вручения
-        if self.instance:
-            if self.instance.delivery_date:
-                bad_conditions.append(
-                    all(['departure_date' in data,
-                         'delivery_date' not in data,
-                         data['departure_date'] > self.instance.delivery_date
-                         ]))
-            # 3) запрос содержит только дату вручения,
-            #    а в экземпляре уже сохранена дата отправки
-            if self.instance.departure_date:
-                bad_conditions.append(
-                    all(['delivery_date' in data,
-                         'departure_date' not in data,
-                         self.instance.departure_date > data['delivery_date']
-                         ]))
+        try:
+            bad_conditions.append(
+                all(['departure_date' in data,
+                     'delivery_date' not in data,
+                     data['departure_date'] > self.instance.delivery_date
+                     ]))
+        except (KeyError, AttributeError, TypeError):
+            bad_conditions.append(False)
+        # 3) запрос содержит только дату вручения,
+        #    а в экземпляре уже сохранена дата отправки
+        try:
+            bad_conditions.append(
+                all(['delivery_date' in data,
+                     'departure_date' not in data,
+                     self.instance.departure_date > data['delivery_date']
+                     ]))
+        except (KeyError, AttributeError, TypeError):
+            bad_conditions.append(False)
 
         if any(bad_conditions):
             raise serializers.ValidationError("Delivery date can not be "
