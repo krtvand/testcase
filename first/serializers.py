@@ -1,3 +1,4 @@
+import decimal
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from . import models
@@ -5,6 +6,7 @@ from . import models
 PARCEL_MAX_WEIGHT = 100
 PARCEL_MIN_WEIGHT = 0.1
 PARCEL_MAX_PRICE = 1000
+PARCEL_COST_OF_DELIVERY_PCT = 0.13
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -261,6 +263,29 @@ class ParcelValidatorMixin:
             raise serializers.ValidationError("Delivery date can not be "
                                               "earlier than departure")
 
+    def parcel_weight_validate(self, data):
+        if 'products' in data:
+            products = data['products']
+            # Проверка массы посылки
+            parcel_weight = sum(p.weight for p in products)
+            if parcel_weight > PARCEL_MAX_WEIGHT:
+                raise serializers.ValidationError("Parsel weight should be less "
+                                                  "then {}".format(PARCEL_MAX_WEIGHT))
+            elif parcel_weight < PARCEL_MIN_WEIGHT:
+                raise serializers.ValidationError("Parsel weight should be more "
+                                                  "then {}".format(PARCEL_MIN_WEIGHT))
+
+    def parcel_price_validate(self, data):
+        if 'products' in data:
+            products = data['products']
+
+            # Проверка стоимости посылки
+            parcel_price = sum(p.price for p in products)
+            if parcel_price > PARCEL_MAX_PRICE:
+                raise serializers.ValidationError("Parsel price should be less "
+                                                  "then {}".format(PARCEL_MAX_PRICE))
+
+
 
 class ParcelSerializer(ParcelValidatorMixin, serializers.ModelSerializer):
     products = serializers.HyperlinkedRelatedField(many=True,
@@ -273,7 +298,7 @@ class ParcelSerializer(ParcelValidatorMixin, serializers.ModelSerializer):
         model = models.Parcel
         fields = ('url', 'recipient', 'isdelivered', 'isrefused', 'departure_date',
                   'delivery_date', 'cost_of_delivery', 'products')
-        # read_only_fields = ('cost_of_delivery',)
+        read_only_fields = ('cost_of_delivery',)
 
     def validate(self, data):
         """ Валидация данных
@@ -285,46 +310,22 @@ class ParcelSerializer(ParcelValidatorMixin, serializers.ModelSerializer):
         Признак вручения не может быть установлен
         одновременно с признаком отказа
         """
-        # TODO устраить повторяемость кода и уменьшить размер функции
 
         self.isdeliv_isrefus_validate(data)
         self.deliv_depart_dates_validate(data)
+        self.parcel_weight_validate(data)
+        self.parcel_price_validate(data)
 
-        if 'products' in data:
-            products = data['products']
-            # Проверка массы посылки
-            parcel_weight = sum(p.weight for p in products)
-            if parcel_weight > PARCEL_MAX_WEIGHT:
-                raise serializers.ValidationError("Parsel weight should be less "
-                                                  "then {}".format(PARCEL_MAX_WEIGHT))
-            elif parcel_weight < PARCEL_MIN_WEIGHT:
-                raise serializers.ValidationError("Parsel weight should be more "
-                                                  "then {}".format(PARCEL_MIN_WEIGHT))
-
-            # Проверка стоимости посылки
-            parcel_price = sum(p.price for p in products)
-            if parcel_price > PARCEL_MAX_PRICE:
-                raise serializers.ValidationError("Parsel price should be less "
-                                                  "then {}".format(PARCEL_MAX_PRICE))
-
-        # # Проверка даты отправки и вручения
-        # # 1.1) Если обновляются обе даты
-        # if all(x in data for x in ('delivery_date', 'departure_date')):
-        #     if data['departure_date'] > data['delivery_date']:
-        #         raise serializers.ValidationError("Delivery date can not be "
-        #                                           "earlier than departure")
-        # # 1.2) Если добавляется дата вручения, а дата отправки
-        # #      уже хранится в экземпляре
-        # elif 'delivery_date' in data:
-        #     if self.instance.departure_date:
-        #         if self.instance.departure_date > data['delivery_date']:
-        #             raise serializers.ValidationError("Delivery date can not be "
-        #                                               "earlier than departure")
-        # # 1.3) Если добавляется дата отправки, а дата вручения
-        # #      уже хранится в экземпляре
-        # elif 'departure_date' in data:
-        #     if self.instance.delivery_date:
-        #         if data['departure_date'] > self.instance.delivery_date:
-        #             raise serializers.ValidationError("Delivery date can not be "
-        #                                               "earlier than departure")
         return data
+
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+
+        instance.cost_of_delivery = \
+            sum(p.price for p in instance.products.all()) * \
+            decimal.Decimal(PARCEL_COST_OF_DELIVERY_PCT)
+
+        instance.save()
+
+        return self.instance
+

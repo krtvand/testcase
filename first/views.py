@@ -30,6 +30,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = models.Product.objects.all()
     serializer_class = serializers.ProductSerializer
 
+    #TODO Разделить статистичиеские данные на отдельные ресурсы
     @detail_route(methods=['get'])
     def statistics(self, request, pk=None):
         """Расчет статистики по товару
@@ -47,16 +48,19 @@ class ProductViewSet(viewsets.ModelViewSet):
         if parcels_with_product:
             # Вероятность отказа
             refused_parcels = parcels_with_product.filter(isrefused=True)
-            refuse_probability_data['refuse_probability'] = len(refused_parcels) / len(parcels_with_product)
+            refuse_probability_data['refuse_probability'] = \
+                len(refused_parcels) / len(parcels_with_product)
 
+            # Другие 3 товара, которые чаще всего заказывают с этим товаром.
             others_products_qs = models.Parcel.objects.values('products')\
                 .annotate(total=Count('products'))\
                 .filter(products__in=[self.get_object()]) \
                 .order_by('-total')
                 # .exclude(products=7)\
-
-            top_others['top_other_products'] = [x['products'] for x in others_products_qs
-                          if x['products'] != self.get_object().id][:TOP_OTHERS_PRODUCT_COUNT]
+            # Из QuerySet выбираем id товаров, исключая текущий товар
+            top_others['top_other_products'] = \
+                [x['products'] for x in others_products_qs
+                 if x['products'] != self.get_object().id][:TOP_OTHERS_PRODUCT_COUNT]
 
         else:
             refuse_probability_data['refuse_probability'] = None
@@ -90,6 +94,36 @@ class BarcodeTypeViewSet(viewsets.ModelViewSet):
 class RecipientViewSet(viewsets.ModelViewSet):
     queryset = models.Recipient.objects.all()
     serializer_class = serializers.RecipientSerializer
+
+    @detail_route(methods=['get'])
+    def statistics(self, request, pk=None):
+        """Расчет статистики по получателю
+
+        Вероятность отказа от посылки. (учитывающая историю
+        врученных получателю посылок)
+        """
+        recipient_parcels = models.Parcel.objects.filter(
+            recipient__in=[self.get_object()]
+        )
+
+        refused_parcels_data = {}
+        if recipient_parcels:
+            # Вероятность отказа
+            refused_parcels = recipient_parcels.filter(isrefused=True)
+            refused_parcels_data['refuse_probability'] = \
+                len(refused_parcels) / len(recipient_parcels)
+        else:
+            refused_parcels_data['refuse_probability'] = None
+
+        # parcel_serializer = serializers.ParcelSerializer(recipient_parcels,
+        #                                                  many=True,
+        #                                                  context={'request': request})
+        # recipient_parcels_data = parcel_serializer.data
+
+        data = [refused_parcels_data]
+        response = Response(data)
+
+        return response
 
 
 class ParcelViewSet(viewsets.ModelViewSet):
