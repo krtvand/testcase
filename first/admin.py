@@ -12,8 +12,12 @@ class BarcodeAdmin(admin.ModelAdmin):
 
 class ProductAdmin(admin.ModelAdmin):
     model = models.Product
-    list_display = ('article', 'vendor', 'name',
-                    'barcode', 'image', 'price', 'weight')
+    list_display = ('article', 'name', 'vendor', 'price', 'weight',
+                    'barcode', 'image')
+
+    # TODO сделать поле Barcode типа Inline
+    # 'first.Barcode' has no ForeignKey to 'first.Product'.
+    # inlines = [BarCodeInline]
 
 
 class RecipientAdmin(admin.ModelAdmin):
@@ -24,6 +28,6 @@ class RecipientAdmin(admin.ModelAdmin):
 admin.site.register(models.BarcodeType)
 admin.site.register(models.Barcode, BarcodeAdmin)
 admin.site.register(models.Vendor)
-# TODO сделать поле Barcode типа Inline
 admin.site.register(models.Product, ProductAdmin)
 admin.site.register(models.Recipient, RecipientAdmin)
+admin.site.register(models.Parcel)

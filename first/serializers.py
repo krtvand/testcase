@@ -9,18 +9,6 @@ PARCEL_MAX_PRICE = 1000
 PARCEL_COST_OF_DELIVERY_PCT = 0.13
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ('url', 'username', 'email', 'groups')
-
-
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Group
-        fields = ('url', 'name')
-
-
 class VendorSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Vendor

@@ -10,23 +10,10 @@ from . import models
 TOP_OTHERS_PRODUCT_COUNT = 3
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = serializers.UserSerializer
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = serializers.GroupSerializer
-
-
 class ProductViewSet(viewsets.ModelViewSet):
+    """
+    Контроллер товара
+    """
     queryset = models.Product.objects.all()
     serializer_class = serializers.ProductSerializer
 
@@ -77,21 +64,33 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 
 class VendorViewSet(viewsets.ModelViewSet):
+    """
+    Контроллер производителя
+    """
     queryset = models.Vendor.objects.all()
     serializer_class = serializers.VendorSerializer
 
 
 class BarcodeViewSet(viewsets.ModelViewSet):
+    """
+    Контроллер штрих-кода
+    """
     queryset = models.Barcode.objects.all()
     serializer_class = serializers.BarcodeSerializer
 
 
 class BarcodeTypeViewSet(viewsets.ModelViewSet):
+    """
+    Контроллер типа штрих-кода
+    """
     queryset = models.BarcodeType.objects.all()
     serializer_class = serializers.BarcodeTypeSerializer
 
 
 class RecipientViewSet(viewsets.ModelViewSet):
+    """
+    Контроллер получателя
+    """
     queryset = models.Recipient.objects.all()
     serializer_class = serializers.RecipientSerializer
 
@@ -127,5 +126,8 @@ class RecipientViewSet(viewsets.ModelViewSet):
 
 
 class ParcelViewSet(viewsets.ModelViewSet):
+    """
+    Контроллер посылки
+    """
     queryset = models.Parcel.objects.all()
     serializer_class = serializers.ParcelSerializer
