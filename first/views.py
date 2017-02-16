@@ -48,8 +48,10 @@ class ProductViewSet(viewsets.ModelViewSet):
                 # .exclude(products=7)\
             # Из QuerySet выбираем id товаров, исключая текущий товар
             top_others['top_other_products'] = \
-                [x['products'] for x in others_products_qs
-                 if x['products'] != self.get_object().id][:TOP_OTHERS_PRODUCT_COUNT]
+                [models.Product.objects.get(pk=x['products']).get_full_absolute_url()
+                 for x in others_products_qs
+                 if x['products'] != self.get_object().id
+                 ][:TOP_OTHERS_PRODUCT_COUNT]
             # print(reverse('product-detail', args=[ top_others[1]])))
 
         else:

@@ -1,4 +1,8 @@
+from django.contrib.sites.models import Site
 from django.db import models
+from django.urls import reverse
+
+from django_rest.settings import ALLOWED_HOSTS
 
 
 class Vendor(models.Model):
@@ -50,6 +54,17 @@ class Product(models.Model):
 
     def __str__(self):
         return '[{}] {}'.format(self.article, self.name)
+
+    def get_full_absolute_url(self):
+        """
+        Абсолютный адрес объекта. Используется в функции
+        получения статистики по товару
+        """
+        # TODO избавиться от этой функции !!!
+        domain = ALLOWED_HOSTS[0]
+        url = reverse('product-detail', args=[self.id])
+
+        return 'http://{}:8000{}'.format(domain, url)
 
 
 class Fullname(models.Model):
