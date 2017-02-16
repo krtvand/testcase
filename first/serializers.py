@@ -294,7 +294,7 @@ class ParcelValidatorMixin:
 
 
 
-class ParcelSerializer(ParcelValidatorMixin, serializers.ModelSerializer):
+class ParcelSerializer(ParcelValidatorMixin, serializers.HyperlinkedModelSerializer):
     """
     Сериализатор посылки
     """
@@ -341,4 +341,3 @@ class ParcelSerializer(ParcelValidatorMixin, serializers.ModelSerializer):
         instance.save()
 
         return self.instance
-

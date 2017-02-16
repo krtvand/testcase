@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
@@ -50,6 +51,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             top_others['top_other_products'] = \
                 [x['products'] for x in others_products_qs
                  if x['products'] != self.get_object().id][:TOP_OTHERS_PRODUCT_COUNT]
+            # print(reverse('product-detail', args=[ top_others[1]])))
 
         else:
             refuse_probability_data['refuse_probability'] = None
