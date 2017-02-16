@@ -2,6 +2,9 @@ from django.db import models
 
 
 class Vendor(models.Model):
+    """
+    Производитель
+    """
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -9,15 +12,20 @@ class Vendor(models.Model):
 
 
 class BarcodeType(models.Model):
-    """e.g EAN-13    """
+    """
+    Тип штрих-кода, например EAN-13
+    """
 
-    type = models.CharField(max_length=20)
+    type = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.type
 
 
 class Barcode(models.Model):
+    """
+    Штрих-код
+    """
     type = models.ForeignKey(BarcodeType, on_delete=models.CASCADE)
     value = models.CharField(max_length=256)
 
@@ -25,43 +33,16 @@ class Barcode(models.Model):
         return '[{}] {}'.format(self.type, self.value)
 
 
-# class Currency(models.Model):
-#     name = models.CharField(max_length=10, default='USD')
-#
-#     def __str__(self):
-#         return self.name
-#
-#
-# class Price(models.Model):
-#     currency = models.ForeignKey(Currency)
-#     value = models.DecimalField(max_digits=9, decimal_places=2)
-#
-#     def __str__(self):
-#         return '[{}] {}'.format(self.value, self.currency)
-
-
-# class WeightType(models.Model):
-#     name = models.CharField(max_length=20)
-#
-#     def __str__(self):
-#         return self.name
-#
-#
-# class Weight(models.Model):
-#     type = models.ForeignKey(WeightType)
-#     value = models.DecimalField(max_digits=10, decimal_places=2)
-#
-#     def __str__(self):
-#         return '[{}] {}'.format(self.value, self.type)
-
-
 class Product(models.Model):
-    article = models.CharField(max_length=20)
+    """
+    Товар
+    """
+    article = models.CharField(max_length=20, unique=True)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    barcode = models.ForeignKey(Barcode,
-                                on_delete=models.CASCADE,
-                                blank=True, null=True)
+    barcode = models.OneToOneField(Barcode,
+                                   on_delete=models.CASCADE,
+                                   blank=True, null=True)
     image = models.ImageField(upload_to='product_images/',
                               blank=True, null=True)
     price = models.DecimalField(max_digits=9, decimal_places=2)
@@ -72,6 +53,9 @@ class Product(models.Model):
 
 
 class Fullname(models.Model):
+    """
+    ФИО Получателя
+    """
     first_name = models.CharField(max_length=30)
     surname = models.CharField(max_length=30)
     patronymic = models.CharField(max_length=30,
@@ -83,8 +67,10 @@ class Fullname(models.Model):
 
 
 class Address(models.Model):
-    # TODO продумать тип адреса, чтобы был интернациональный
-    postal_code = models.CharField(max_length=6)
+    """
+    Адрес получателя
+    """
+    postal_code = models.CharField(max_length=6, blank=True)
     country = models.CharField(max_length=30)
     state = models.CharField(max_length=30, blank=True)
     city = models.CharField(max_length=30, blank=True)
@@ -97,6 +83,9 @@ class Address(models.Model):
 
 
 class Recipient(models.Model):
+    """
+    Получатель
+    """
     fullname = models.ForeignKey(Fullname, on_delete=models.CASCADE)
     address = models.ForeignKey(Address)
     photo = models.ImageField(upload_to='recipient_photos/',
@@ -115,10 +104,14 @@ class ProductInParcel(models.Model):
 
 
 class Parcel(models.Model):
+    """
+    Посылка
+    """
     # TODO включить параметр количество товаров для данной позиции,
     # скорее всего придется описать промежуточную модель.
     # products = models.ManyToManyField(ProductInParcel)
-
+    # TODO Включить расчет стоимости доставки посылки при изменении
+    # модели через django admin
     products = models.ManyToManyField(Product)
     recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE)
     isdelivered = models.BooleanField()
@@ -129,6 +122,13 @@ class Parcel(models.Model):
                                            blank=True, null=True)
 
     def __str__(self):
-        return '{}, {}, {}'.format(self.recipient,
-                                   self.departure_date,
-                                   self.cost_of_delivery)
+        return '{}, {}, {}'.format(self.recipient.fullname,
+                                       self.departure_date,
+                                       self.cost_of_delivery)
+
+    def products_str(self):
+        """
+        Строковое отображение списка товаров в посылке (для django admin)
+        """
+        products = [p.name for p in self.products.all()][:50]
+        return products

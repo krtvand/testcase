@@ -1,7 +1,5 @@
 from django.contrib import admin
 
-# Register your models here.
-
 from . import models
 
 
@@ -25,9 +23,14 @@ class RecipientAdmin(admin.ModelAdmin):
     list_display = ('fullname', 'address', 'photo',
                     'registration_date')
 
+class ParcelAdmin(admin.ModelAdmin):
+    model = models.Parcel
+    list_display = ('recipient', 'isdelivered', 'isrefused',
+                    'departure_date', 'delivery_date', 'cost_of_delivery', 'products_str')
+
 admin.site.register(models.BarcodeType)
 admin.site.register(models.Barcode, BarcodeAdmin)
 admin.site.register(models.Vendor)
 admin.site.register(models.Product, ProductAdmin)
 admin.site.register(models.Recipient, RecipientAdmin)
-admin.site.register(models.Parcel)
+admin.site.register(models.Parcel, ParcelAdmin)

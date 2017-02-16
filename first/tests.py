@@ -1,14 +1,18 @@
 from django.urls import reverse
+from django.contrib.auth.models import User
 from rest_framework import status
+from rest_framework.request import Request
 from rest_framework.test import APITestCase
 from rest_framework.test import APIRequestFactory
-from rest_framework.request import Request
-from django.contrib.auth.models import User
+
 from . import models
 from . import serializers
 
 
 class ProductTests(APITestCase):
+    """
+    Тестируем CRUD для товара
+    """
     def setUp(self):
         self.superuser = User.objects.create_superuser('reviewer', 'reviewer@snow.com', '$1mb1r$0ft')
         self.user = User.objects.get(username='reviewer')
@@ -30,6 +34,9 @@ class ProductTests(APITestCase):
         )
 
     def test_create_product(self):
+        """
+        Создание
+        """
         url = reverse('product-list')
         article = "9874563245"
         cur_obj_count = models.Product.objects.count()
@@ -56,6 +63,7 @@ class ProductTests(APITestCase):
         data = data_s.data
         data['price'] = 89.9
         response = self.client.put(reverse('product-detail', args=[self.product.id]), data, format='json')
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_read_product_list(self):

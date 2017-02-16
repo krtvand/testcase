@@ -1,9 +1,8 @@
-from django.contrib.auth.models import User, Group
 from django.db.models import Count
 from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import detail_route
+from rest_framework.response import Response
+
 from . import serializers
 from . import models
 
@@ -17,7 +16,10 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = models.Product.objects.all()
     serializer_class = serializers.ProductSerializer
 
-    #TODO Разделить статистичиеские данные на отдельные ресурсы
+    #TODO Разделить статистичиеские данные на отдельные ресурсы,
+    # выделить статистику как отдельный ресурс,
+    # а конкретные данные выводить в списке доступных подресурсов
+
     @detail_route(methods=['get'])
     def statistics(self, request, pk=None):
         """Расчет статистики по товару
@@ -53,9 +55,6 @@ class ProductViewSet(viewsets.ModelViewSet):
             refuse_probability_data['refuse_probability'] = None
             top_others['top_other_products'] = None
             # refused_parcels = []
-
-        # parcel_serializer = serializers.ParcelSerializer(refused_parcels, many=True, context={'request': request})
-        # refused_parcels_data = parcel_serializer.data
 
         data = [refuse_probability_data, top_others]
         response = Response(data)
@@ -98,8 +97,9 @@ class RecipientViewSet(viewsets.ModelViewSet):
     def statistics(self, request, pk=None):
         """Расчет статистики по получателю
 
-        Вероятность отказа от посылки. (учитывающая историю
-        врученных получателю посылок)
+        Вероятность отказа от посылки. (учитывающая историю врученных
+        получателю посылок). Рассчитывается как отношение числа
+        отказанных посылок к общему количеству заказанных посылок
         """
         recipient_parcels = models.Parcel.objects.filter(
             recipient__in=[self.get_object()]
@@ -113,11 +113,6 @@ class RecipientViewSet(viewsets.ModelViewSet):
                 len(refused_parcels) / len(recipient_parcels)
         else:
             refused_parcels_data['refuse_probability'] = None
-
-        # parcel_serializer = serializers.ParcelSerializer(recipient_parcels,
-        #                                                  many=True,
-        #                                                  context={'request': request})
-        # recipient_parcels_data = parcel_serializer.data
 
         data = [refused_parcels_data]
         response = Response(data)

@@ -1,6 +1,7 @@
 import decimal
-from django.contrib.auth.models import User, Group
+
 from rest_framework import serializers
+
 from . import models
 
 PARCEL_MAX_WEIGHT = 100
@@ -28,10 +29,9 @@ class BarcodeSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ProductSerializer(serializers.HyperlinkedModelSerializer):
-    # Вопрос - какой формат производителя в api
-    # предпочтительнее? Hyperlink или id + name
-    # т.е. есть ли смысл описывать вложенные сериализаторы?
-
+    """
+    Сериализатор товара
+    """
     # TODO изменять название изображений при загрузке на уникальное, при
     # DELETE запросах, удалять из файловой системы
 
@@ -85,18 +85,27 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class FullnameSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор ФИО получателя
+    """
     class Meta:
         model = models.Fullname
         fields = ('first_name', 'surname', 'patronymic')
 
 
 class AddressSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор адреса получателя
+    """
     class Meta:
         model = models.Address
         fields = ('postal_code', 'country', 'state', 'city', 'address')
 
 
 class RecipientSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Сериализатор получателя
+    """
     # TODO изменять название изображений при загрузке на уникальное, при
     # DELETE запросах, удалять из файловой системы
 
@@ -155,6 +164,11 @@ class RecipientSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ParcelValidatorMixin:
+    """
+    Примесь, реализующая проверку полчаемых данных
+    в REST для ресурса "Посылка"
+    """
+
     def isdeliv_isrefus_validate(self, data):
         """Проверка флагов 'isdelivered', 'isrefused'
 
@@ -252,6 +266,9 @@ class ParcelValidatorMixin:
                                               "earlier than departure")
 
     def parcel_weight_validate(self, data):
+        """
+        Проверка общей массы посылки
+        """
         if 'products' in data:
             products = data['products']
             # Проверка массы посылки
@@ -264,10 +281,12 @@ class ParcelValidatorMixin:
                                                   "then {}".format(PARCEL_MIN_WEIGHT))
 
     def parcel_price_validate(self, data):
+        """
+        Проверка общей стоимости посылки
+        """
         if 'products' in data:
             products = data['products']
 
-            # Проверка стоимости посылки
             parcel_price = sum(p.price for p in products)
             if parcel_price > PARCEL_MAX_PRICE:
                 raise serializers.ValidationError("Parsel price should be less "
@@ -276,6 +295,9 @@ class ParcelValidatorMixin:
 
 
 class ParcelSerializer(ParcelValidatorMixin, serializers.ModelSerializer):
+    """
+    Сериализатор посылки
+    """
     products = serializers.HyperlinkedRelatedField(many=True,
                                                    view_name='product-detail',
                                                    queryset=models.Product.objects.all())
@@ -298,7 +320,6 @@ class ParcelSerializer(ParcelValidatorMixin, serializers.ModelSerializer):
         Признак вручения не может быть установлен
         одновременно с признаком отказа
         """
-
         self.isdeliv_isrefus_validate(data)
         self.deliv_depart_dates_validate(data)
         self.parcel_weight_validate(data)
@@ -307,6 +328,10 @@ class ParcelSerializer(ParcelValidatorMixin, serializers.ModelSerializer):
         return data
 
     def save(self, **kwargs):
+        """
+        При каждом изменении данных пересчитываем
+        стоимость доставки посылки
+        """
         instance = super().save(**kwargs)
 
         instance.cost_of_delivery = \
