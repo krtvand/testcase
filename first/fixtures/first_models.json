@@ -1,0 +1,500 @@
+[
+{
+    "model": "first.vendor",
+    "pk": 1,
+    "fields": {
+        "name": "Apple"
+    }
+},
+{
+    "model": "first.vendor",
+    "pk": 2,
+    "fields": {
+        "name": "Samsung"
+    }
+},
+{
+    "model": "first.vendor",
+    "pk": 3,
+    "fields": {
+        "name": "DELL"
+    }
+},
+{
+    "model": "first.vendor",
+    "pk": 5,
+    "fields": {
+        "name": "ChainaFact"
+    }
+},
+{
+    "model": "first.vendor",
+    "pk": 6,
+    "fields": {
+        "name": "Beats"
+    }
+},
+{
+    "model": "first.barcodetype",
+    "pk": 1,
+    "fields": {
+        "type": "EAN-13"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 1,
+    "fields": {
+        "type": 1,
+        "value": "3325060650699"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 2,
+    "fields": {
+        "type": 1,
+        "value": "3216547890325"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 3,
+    "fields": {
+        "type": 1,
+        "value": "9184435853111"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 4,
+    "fields": {
+        "type": 1,
+        "value": "4208470977647"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 5,
+    "fields": {
+        "type": 1,
+        "value": "7899075372650"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 6,
+    "fields": {
+        "type": 1,
+        "value": "8004946925617"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 7,
+    "fields": {
+        "type": 1,
+        "value": "9884206920605"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 8,
+    "fields": {
+        "type": 1,
+        "value": "3039847643575"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 9,
+    "fields": {
+        "type": 1,
+        "value": "3039840643575"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 10,
+    "fields": {
+        "type": 1,
+        "value": "5909709869705"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 11,
+    "fields": {
+        "type": 1,
+        "value": "4731901922405"
+    }
+},
+{
+    "model": "first.barcode",
+    "pk": 12,
+    "fields": {
+        "type": 1,
+        "value": "4232909434983"
+    }
+},
+{
+    "model": "first.product",
+    "pk": 1,
+    "fields": {
+        "article": "123456",
+        "vendor": 1,
+        "name": "IPhone Cover",
+        "barcode": 1,
+        "image": "product_images/featured-content-iphone-transfer-content-ios10_2x_MofYs5n.png",
+        "price": "0.50",
+        "weight": "0.67"
+    }
+},
+{
+    "model": "first.product",
+    "pk": 4,
+    "fields": {
+        "article": "321654",
+        "vendor": 2,
+        "name": "Galaxy",
+        "barcode": 2,
+        "image": "",
+        "price": "65.75",
+        "weight": "0.80"
+    }
+},
+{
+    "model": "first.product",
+    "pk": 5,
+    "fields": {
+        "article": "341526",
+        "vendor": 3,
+        "name": "BladeServer",
+        "barcode": 6,
+        "image": "product_images/dell.png",
+        "price": "999.00",
+        "weight": "99.00"
+    }
+},
+{
+    "model": "first.product",
+    "pk": 6,
+    "fields": {
+        "article": "924168",
+        "vendor": 1,
+        "name": "IPhone",
+        "barcode": 7,
+        "image": "",
+        "price": "500.00",
+        "weight": "0.20"
+    }
+},
+{
+    "model": "first.product",
+    "pk": 7,
+    "fields": {
+        "article": "521982",
+        "vendor": 5,
+        "name": "Protective glass",
+        "barcode": 8,
+        "image": "",
+        "price": "1.99",
+        "weight": "0.05"
+    }
+},
+{
+    "model": "first.product",
+    "pk": 8,
+    "fields": {
+        "article": "184835",
+        "vendor": 6,
+        "name": "\u041deadphones",
+        "barcode": 9,
+        "image": "",
+        "price": "12.32",
+        "weight": "45.30"
+    }
+},
+{
+    "model": "first.product",
+    "pk": 9,
+    "fields": {
+        "article": "044685",
+        "vendor": 1,
+        "name": "Battary for samsung",
+        "barcode": 10,
+        "image": "product_images/diagram_Jr6ACkC.png",
+        "price": "12.00",
+        "weight": "0.10"
+    }
+},
+{
+    "model": "first.product",
+    "pk": 10,
+    "fields": {
+        "article": "906488",
+        "vendor": 1,
+        "name": "testproduct",
+        "barcode": 11,
+        "image": "product_images/featured-content-ipad-icon_2x_mLxXHUH.png",
+        "price": "12.32",
+        "weight": "45.30"
+    }
+},
+{
+    "model": "first.product",
+    "pk": 11,
+    "fields": {
+        "article": "393452",
+        "vendor": 1,
+        "name": "testproduct2",
+        "barcode": 12,
+        "image": "product_images/featured-content-iphone-transfer-content-ios10_2x_mkmc3gl.png",
+        "price": "12.32",
+        "weight": "45.30"
+    }
+},
+{
+    "model": "first.product",
+    "pk": 13,
+    "fields": {
+        "article": "240463",
+        "vendor": 1,
+        "name": "testproduct3",
+        "barcode": 3,
+        "image": "product_images/featured-content-ipad-icon_2x_ab6wFvm.png",
+        "price": "12.32",
+        "weight": "45.30"
+    }
+},
+{
+    "model": "first.fullname",
+    "pk": 1,
+    "fields": {
+        "first_name": "Andrew",
+        "surname": "Kartaev",
+        "patronymic": ""
+    }
+},
+{
+    "model": "first.fullname",
+    "pk": 2,
+    "fields": {
+        "first_name": "Andrew",
+        "surname": "Kartaev",
+        "patronymic": ""
+    }
+},
+{
+    "model": "first.fullname",
+    "pk": 3,
+    "fields": {
+        "first_name": "\u0439\u0443\u0446\u043a",
+        "surname": "\u0444\u044b\u0432\u0430",
+        "patronymic": "\u044f\u0447\u0441"
+    }
+},
+{
+    "model": "first.fullname",
+    "pk": 4,
+    "fields": {
+        "first_name": "\u0418\u0432\u0430\u043d",
+        "surname": "\u041f\u0435\u0442\u0440\u043e\u0432",
+        "patronymic": "\u0424\u0435\u0434\u043e\u0440\u043e\u0432\u0438\u0447"
+    }
+},
+{
+    "model": "first.address",
+    "pk": 1,
+    "fields": {
+        "postal_code": "430009",
+        "country": "Russia",
+        "state": "Mordovia",
+        "city": "Saransk",
+        "address": "Volgagradskaya, 60/2, 155"
+    }
+},
+{
+    "model": "first.address",
+    "pk": 2,
+    "fields": {
+        "postal_code": "430009",
+        "country": "Russia",
+        "state": "Mordovia",
+        "city": "Saransk",
+        "address": "Volgagradskaya, 60/2, 156"
+    }
+},
+{
+    "model": "first.address",
+    "pk": 3,
+    "fields": {
+        "postal_code": "132415",
+        "country": "\u044b\u0444\u0430\u0432\u043f\u044b\u0440",
+        "state": "\u0447\u0447\u043c\u0441\u0438",
+        "city": "\u044b\u0430\u0432\u043f\u0440",
+        "address": "\u044b\u0432\u0430\u043f\u044b\u0432\u0430"
+    }
+},
+{
+    "model": "first.address",
+    "pk": 4,
+    "fields": {
+        "postal_code": "431770",
+        "country": "\u0420\u043e\u0441\u0441\u0438\u044f",
+        "state": "\u041c\u043e\u0440\u0434\u043e\u0432\u0438\u044f",
+        "city": "",
+        "address": "\u0441. \u041c\u0443\u0434\u0440\u043e\u0435, \u0443\u043b. \u0413\u0430\u0433\u0430\u0440\u0438\u043d\u0430, \u0434.15"
+    }
+},
+{
+    "model": "first.recipient",
+    "pk": 1,
+    "fields": {
+        "fullname": 2,
+        "address": 2,
+        "photo": "recipient_photos/panda.jpg",
+        "registration_date": "2017-02-10"
+    }
+},
+{
+    "model": "first.recipient",
+    "pk": 3,
+    "fields": {
+        "fullname": 4,
+        "address": 4,
+        "photo": "",
+        "registration_date": "2017-02-13"
+    }
+},
+{
+    "model": "first.parcel",
+    "pk": 2,
+    "fields": {
+        "recipient": 1,
+        "isdelivered": false,
+        "isrefused": false,
+        "departure_date": "2017-02-11",
+        "delivery_date": "2017-03-21",
+        "cost_of_delivery": "0.00",
+        "products": [
+            8,
+            1,
+            6
+        ]
+    }
+},
+{
+    "model": "first.parcel",
+    "pk": 3,
+    "fields": {
+        "recipient": 1,
+        "isdelivered": true,
+        "isrefused": false,
+        "departure_date": "2017-02-10",
+        "delivery_date": "2017-03-10",
+        "cost_of_delivery": "0.00",
+        "products": [
+            8,
+            7
+        ]
+    }
+},
+{
+    "model": "first.parcel",
+    "pk": 4,
+    "fields": {
+        "recipient": 1,
+        "isdelivered": false,
+        "isrefused": true,
+        "departure_date": "2017-02-11",
+        "delivery_date": "2017-02-12",
+        "cost_of_delivery": "0.00",
+        "products": [
+            8,
+            7,
+            1
+        ]
+    }
+},
+{
+    "model": "first.parcel",
+    "pk": 5,
+    "fields": {
+        "recipient": 1,
+        "isdelivered": false,
+        "isrefused": true,
+        "departure_date": "2017-02-12",
+        "delivery_date": "2017-02-13",
+        "cost_of_delivery": "16.19",
+        "products": [
+            1,
+            6
+        ]
+    }
+},
+{
+    "model": "first.parcel",
+    "pk": 6,
+    "fields": {
+        "recipient": 1,
+        "isdelivered": false,
+        "isrefused": true,
+        "departure_date": "2017-02-12",
+        "delivery_date": "2017-02-13",
+        "cost_of_delivery": "0.00",
+        "products": [
+            6
+        ]
+    }
+},
+{
+    "model": "first.parcel",
+    "pk": 7,
+    "fields": {
+        "recipient": 1,
+        "isdelivered": false,
+        "isrefused": true,
+        "departure_date": "2017-02-12",
+        "delivery_date": "2017-02-13",
+        "cost_of_delivery": "0.00",
+        "products": [
+            7,
+            6
+        ]
+    }
+},
+{
+    "model": "first.parcel",
+    "pk": 9,
+    "fields": {
+        "recipient": 1,
+        "isdelivered": false,
+        "isrefused": false,
+        "departure_date": "2017-02-14",
+        "delivery_date": null,
+        "cost_of_delivery": "14.60",
+        "products": [
+            4,
+            8,
+            9
+        ]
+    }
+},
+{
+    "model": "first.parcel",
+    "pk": 10,
+    "fields": {
+        "recipient": 1,
+        "isdelivered": false,
+        "isrefused": false,
+        "departure_date": "2017-02-14",
+        "delivery_date": null,
+        "cost_of_delivery": "3.16",
+        "products": [
+            8,
+            9
+        ]
+    }
+}
+]

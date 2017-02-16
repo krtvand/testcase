@@ -1,3 +1,6 @@
+from datetime import date
+from datetime import timedelta
+
 from django.urls import reverse
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -7,6 +10,57 @@ from rest_framework.test import APIRequestFactory
 
 from . import models
 from . import serializers
+
+
+class ParcelTests(APITestCase):
+    """
+    Тестируем CRUD для посылки
+    """
+    fixtures = ['first_models.json', 'users.json']
+
+    def setUp(self):
+        self.client.force_authenticate(user=User.objects.get(username='reviewer'))
+
+        factory = APIRequestFactory()
+        self.request = factory.get('/')
+
+    def test_read_parcel_list(self):
+        response = self.client.get(reverse('parcel-list'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_read_parcel_detail(self):
+        parcel = models.Parcel.objects.first()
+        response = self.client.get(reverse('parcel-detail', args=[parcel.id]))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_isdeliv_isrefuse(self):
+        """
+        Пытаемся установить флаг isrefused = True для посылки,
+        у которой уже установлен флаг isdelivered=True
+        """
+        parcel = models.Parcel.objects.filter(isdelivered=True).first()
+        data_s = serializers.ParcelSerializer(
+            instance=parcel,
+            context={'request': Request(self.request)})
+        data = data_s.data
+        data['isrefused'] = True
+        response = self.client.put(reverse('parcel-detail', args=[parcel.id]), data, format='json')
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_departure_date(self):
+        """
+        Пытаемся установить дату вручения, раньше чем дату отправления
+        """
+        parcel = models.Parcel.objects.first()
+        data_s = serializers.ParcelSerializer(
+            instance=parcel,
+            context={'request': Request(self.request)})
+        data = data_s.data
+        data['departure_date'] = date.today()
+        data['delivery_date'] = date.today() + timedelta(days=-5)
+        response = self.client.put(reverse('parcel-detail', args=[parcel.id]), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class ProductTests(APITestCase):
@@ -52,8 +106,6 @@ class ProductTests(APITestCase):
             }
         }
         response = self.client.post(url, data, format='json')
-        print('create ', response.data)
-        print(self.product.id)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(models.Product.objects.count(), cur_obj_count + 1)
         self.assertEqual(models.Product.objects.get(name='testproduct').article, article)
@@ -73,5 +125,3 @@ class ProductTests(APITestCase):
     def test_can_read_product_detail(self):
         response = self.client.get(reverse('product-detail', args=[self.product.id]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-

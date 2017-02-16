@@ -112,22 +112,16 @@ class Recipient(models.Model):
         return '{}, {}'.format(self.fullname, self.address)
 
 
-class ProductInParcel(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    count = models.IntegerField()
-    comment = models.CharField(max_length=500)
-
-
 class Parcel(models.Model):
     """
     Посылка
     """
     # TODO включить параметр количество товаров для данной позиции,
-    # скорее всего придется описать промежуточную модель.
-    # products = models.ManyToManyField(ProductInParcel)
+    # products = models.ManyToManyField(Product, through='ProductInParcel')
     # TODO Включить расчет стоимости доставки посылки при изменении
     # модели через django admin
     products = models.ManyToManyField(Product)
+    # products = models.ManyToManyField(Product, through='ProductInParcel')
     recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE)
     isdelivered = models.BooleanField()
     isrefused = models.BooleanField()
@@ -147,3 +141,10 @@ class Parcel(models.Model):
         """
         products = [p.name for p in self.products.all()][:50]
         return products
+
+
+class ProductInParcel(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    parcel = models.ForeignKey(Parcel, on_delete=models.CASCADE)
+    count = models.IntegerField(default=1)
+    comment = models.CharField(max_length=500, blank=True, null=True)
