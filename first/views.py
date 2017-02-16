@@ -6,8 +6,7 @@ from rest_framework.response import Response
 
 from . import serializers
 from . import models
-
-TOP_OTHERS_PRODUCT_COUNT = 3
+from .config import *
 
 
 class ProductViewSet(viewsets.ModelViewSet):

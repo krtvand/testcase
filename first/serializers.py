@@ -3,11 +3,7 @@ import decimal
 from rest_framework import serializers
 
 from . import models
-
-PARCEL_MAX_WEIGHT = 100
-PARCEL_MIN_WEIGHT = 0.1
-PARCEL_MAX_PRICE = 1000
-PARCEL_COST_OF_DELIVERY_PCT = 0.13
+from .config import *
 
 
 class VendorSerializer(serializers.HyperlinkedModelSerializer):
