@@ -7,18 +7,27 @@ from .config import *
 
 
 class VendorSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Сериализатор для модели производитель
+    """
     class Meta:
         model = models.Vendor
         fields = ('url', 'id', 'name')
 
 
 class BarcodeTypeSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Сериализатор для модели тип штрих-кода
+    """
     class Meta:
         model = models.BarcodeType
         fields = ('url', 'type')
 
 
 class BarcodeSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Сериализатор для модели штрихкод
+    """
     class Meta:
         model = models.Barcode
         fields = ('url', 'type', 'value')
@@ -43,13 +52,15 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
         depth = 2
 
     def create(self, validated_data):
+        """
+        Дополнительно сохраняем вложенный объект
+        """
         if 'barcode' in validated_data:
             barcode_data = validated_data.pop('barcode')
             barcode = models.Barcode.objects.create(**barcode_data)
             product = models.Product.objects.create(barcode=barcode,
                                                     **validated_data)
         else:
-            # TODO проверить создание товара без штрих-кода
             product = models.Product.objects.create(**validated_data)
         return product
 
@@ -114,6 +125,9 @@ class RecipientSerializer(serializers.HyperlinkedModelSerializer):
         read_only_fields = ('registration_date',)
 
     def create(self, validated_data):
+        """
+        Дополнительно сохраняем вложенные объекты ФИО и Адрес
+        """
         fullname_data = validated_data.pop('fullname')
         fullname = models.Fullname.objects.create(**fullname_data)
         address_data = validated_data.pop('address')
